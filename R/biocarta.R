@@ -438,8 +438,6 @@ mark_gene = function(grob, entrez_id, fun, min_area = 0, capture = FALSE) {
 	grob
 }
 
-
-
 coords_to_xy = function(coords, shape) {
 	n = length(coords)
 	if(shape == "poly") {
