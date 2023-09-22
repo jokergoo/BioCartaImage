@@ -1,5 +1,5 @@
 
-
+setwd("~/project/development/BioCartaImage")
 
 library(rvest)
 
@@ -16,7 +16,6 @@ names = names[l]
 
 read_pathway = function(link) {
 	cat(link, "\n")
-	Sys.sleep(1)
 
 	html = read_html(link)
 
@@ -57,12 +56,15 @@ pl = lapply(pl, function(x) {
 })
 
 pathway_list = lapply(pl, function(x) {
-	x[c("id", "name", "genes", "shape", "coords")]
+	x2 = x[c("id", "name", "genes", "shape", "coords")]
+	x2$image_file = basename(x$image_link)
+	class(x2) = "biocarta_pathway"
+	x2
 })
 names(pathway_list) = sapply(pathway_list, function(x) x$id)
 
 BIOCARTA_PATHWAYS = pathway_list
-save(BIOCARTA_PATHWAYS, file = "BIOCARTA_PATHWAYSRData", compress = "xz")
+save(BIOCARTA_PATHWAYS, file = "data/BIOCARTA_PATHWAYS.RData", compress = "xz")
 
 # download all gif images
 for(i in seq_along(pl)) {

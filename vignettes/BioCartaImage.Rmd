@@ -1,0 +1,206 @@
+---
+title: "Customize BioCarta Pathway Images"
+author: "Zuguang Gu (z.gu@dkfz.de)"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Customize BioCarta Pathway Images}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, eval = TRUE, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+    fig.width = 7,
+    fig.height = 7,
+    error = FALSE,
+    tidy  = FALSE,
+    message = FALSE
+)
+```
+
+BioCarta is a valuable source of biological pathways which not only provides
+well manually curated pathways, but also remarkably intuitive pathway images.
+One useful features of pathway analysis which is to highlight genes of
+interest on the pathway images has been lost. Since the original source of
+BioCarta (biocarte.com) is lost from the internet, we digged out the data from
+the internet archive and formatted it into a package.
+
+The BioCarta data is collected from
+https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways.
+This is an archive of BioCarta's successor website cgap.nci.nih.gov which is
+also retired from internet. The snapshot is taken on 2017-01-22. Member genes as well
+as the coordinates on the image are parsed from the HTML code. The script is
+also shipped in the package:
+
+```{r}
+system.file("script", "process.R", package = "BioCartaImage")
+```
+
+The total pathways in the BioCarta database:
+
+```{r}
+library(BioCartaImage)
+ap = all_pathways()
+length(ap)
+head(ap)
+```
+
+A single pathway can be obtained by providing the pathway ID:
+
+```{r}
+p = get_pathway("h_RELAPathway")
+p
+```
+
+The pathway object `p` is actually a very simply list which contains
+coordinates of member genes.
+
+```{r}
+str(p)
+```
+
+Similar as many other packages which contain BioCarta gene sets, the member
+genes of a pathway can be obtained by `genes_in_pathway()`. You can provide
+the pathway ID or the pathway object. The EntreZ ID is used as the gene ID
+type.
+
+```{r}
+genes_in_pathway("h_RELAPathway")
+genes_in_pathway(p)
+```
+
+Next, let's move to the main functionality of this package: customizing the
+pathway.
+
+First, as many other **grid** plotting functions, `grid.pathway()` draws a
+pathway (where the pathway image is a `raster` object internally).
+
+```{r}
+library(grid)
+grid.newpage()
+grid.pathway("h_RELAPathway")
+```
+
+You can specify the location and how the image is aligned to the anchor point.
+
+
+```{r}
+grid.newpage()
+grid.pathway("h_RELAPathway", x = 0.2, y = 0.2, just = c("left", "bottom"),
+    width = unit(6, "cm"))
+```
+
+You can also first create a viewport, then draw the pathway inside it.
+
+
+```{r}
+grid.newpage()
+pushViewport(viewport(width = 0.7, height = 0.5))
+grid.rect() # to show the area of the viewport
+grid.pathway("h_RELAPathway")
+```
+
+As the aspect ratio of the image is fixed, you can either set `width` or
+`height`. If both are set, the size of the image is internally adjusted to let
+the image maximally fill the plotting region.
+
+One of the main use of the pathway image is to highlight genes of interest.
+The simple use is to set the `color` argument which is a named vector where
+gene EntreZ ID are names. When the colors are set, the genes are highlighted
+with dashed colored borders.
+
+```{r}
+grid.newpage()
+grid.pathway("h_RELAPathway", color = c("1387" = "yellow"))
+```
+
+As normally BioCarta pathway images are colorful, it is quite difficult to
+find a proper color to be distinguished from other genes. There is a more
+flexible way in the package which allows to add self-defined graphics besides
+the genes.
+
+To edit the pathway image, we create the pathway grob first ("grob" is short for "graphic object").
+
+```{r}
+grob = pathwayGrob("h_RELAPathway")
+```
+
+The object `grob` basically contains a viewport and a raster image. Later we
+can add graphics for single genes to it.
+
+Graphics for single genes are added by the function `mark_gene()`. You need to
+provide the pathway grob, the gene EntreZ ID and a self-defined graphics
+function. As you can imagine, the input of the function is the coordinate of
+the polygon of the gene in forms of two vectors: the x-coordinates and the
+y-coordinates.
+
+There are two ways to implement the graphics function. First, the function
+directly returns a grob object. Later this grob is inserted to the global
+pathway grob.
+
+There is a helper function `pos_by_polygon()` which returns the position of a
+certain side of the polygon.
+
+In the following code, we add a yellow point to the left side of gene "1387"
+(CBP in the image).
+
+The graphics are drawn in the pathway image viewport which already has a
+coordinate system associated. the "xscale" and "yscale" correspond to the
+numbers of pixels horizontally and vertically. So `unit(1, "native")` means 1
+pixel in the original image.
+
+```{r}
+grid.newpage()
+grob2 = mark_gene(grob, "1387", function(x, y) {
+    pos = pos_by_polygon(x, y, where = "left")
+    pointsGrob(pos[1], pos[2], default.units = "native",
+        pch = 16, gp = gpar(col = "yellow"))
+})
+grid.draw(grob2)
+```
+
+If you have complicated graphics, you can consider to use `gTree()` and
+`gList()` to combine them.
+
+If you are not familiar with `gTree()` and `gList()` or `*Grob()` functions.
+You can directly use the grid plotting functions such as `grid.points()` or
+`grid.lines()`. In this case, you have to set `capture` to `TRUE`, then the
+graphics will be captured as grobs internally.
+
+
+```{r}
+grid.newpage()
+grob3 = mark_gene(grob, "1387", function(x, y) {
+    pos = pos_by_polygon(x, y, where = "left")
+    grid.points(pos[1], pos[2], default.units = "native",
+        pch = 16, gp = gpar(col = "yellow"))
+}, capture = TRUE)
+grid.draw(grob3)
+```
+
+With this functionality, you can implement complicated graphics to associate
+to a gene. In the following example, we create a viewport and put it on the
+left of the gene.
+
+```{r}
+grid.newpage()
+grob4 = mark_gene(grob, "1387", function(x, y) {
+    pos = pos_by_polygon(x, y)
+    pushViewport(viewport(x = pos[1] - 10, y = pos[2], 
+        width = unit(4, "cm"), height = unit(4, "cm"), 
+        default.units = "native", just = "right"))
+    grid.rect(gp = gpar(fill = "red"))
+    grid.text("add whatever\nyou want here")
+    popViewport()
+}, capture = TRUE)
+grid.draw(grob4)
+```
+
+
+## Session info
+
+```{r}
+sessionInfo()
+```

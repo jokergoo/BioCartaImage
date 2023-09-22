@@ -2,7 +2,7 @@
 % Please edit documentation in R/biocarta.R
 \name{all_pathways}
 \alias{all_pathways}
-\title{All Biocarta pathways}
+\title{All BioCarta pathways}
 \usage{
 all_pathways()
 }
@@ -10,7 +10,7 @@ all_pathways()
 A vector of pathway IDs.
 }
 \description{
-All Biocarta pathways
+All BioCarta pathways
 }
 \examples{
 all_pathways()

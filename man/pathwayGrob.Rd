@@ -13,8 +13,6 @@ grid.pathway(
   width = NULL,
   height = NULL,
   just = "centre",
-  hjust = NULL,
-  vjust = NULL,
   default.units = "npc",
   name = NULL
 )
@@ -27,17 +25,47 @@ pathwayGrob(
   width = NULL,
   height = NULL,
   just = "centre",
-  hjust = NULL,
-  vjust = NULL,
   default.units = "npc",
   name = NULL
 )
 }
 \arguments{
-\item{pathway}{A pathway ID or a `biocarta_pathway` object.}
+\item{pathway}{A pathway ID or a \code{biocarta_pathway} object.}
 
-\item{name}{}
+\item{color}{A named vector where names should correspond to Entrez IDs.}
+
+\item{x}{A numeric vector or unit object specifying x-location.}
+
+\item{y}{A numeric vector or unit object specifying y-location.}
+
+\item{width}{A numeric vector or unit object specifying width.}
+
+\item{height}{A numeric vector or unit object specifying width.}
+
+\item{just}{The same as in \code{\link[grid:viewport]{grid::viewport()}}.}
+
+\item{default.units}{The same as in \code{\link[grid:viewport]{grid::viewport()}}.}
+
+\item{name}{The same as in \code{\link[grid:viewport]{grid::viewport()}}.}
+}
+\value{
+\code{pathwayGrob()} returns a \code{gTree} object.
 }
 \description{
 Draw a BioCarta pathway
+}
+\details{
+The graphics object contains a pathway image and genes highlighted on the image.
+
+The aspect ratio of the image is kept. If one of \code{width} and \code{height} is set, the
+other dimension is calculated by the aspect ratio. If both of \code{width} and \code{height}
+is set or inherit from parent viewport, the width and height are automatically adjust
+to let one dimension completely fill the viewport.
+}
+\examples{
+library(grid)
+grid.newpage()
+grid.pathway("h_RELAPathway")
+
+grob = pathwayGrob("h_RELAPathway")
 }

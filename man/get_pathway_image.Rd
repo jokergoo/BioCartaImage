@@ -2,15 +2,18 @@
 % Please edit documentation in R/biocarta.R
 \name{get_pathway_image}
 \alias{get_pathway_image}
+\alias{image_dimension}
 \title{Download the pathway image}
 \usage{
-get_pathway_image(pathway_id)
+get_pathway_image(pathway)
+
+image_dimension(pathway)
 }
 \arguments{
-\item{pathway_id}{A pathway ID.}
+\item{pathway}{A pathway ID or a \code{biocarta_pathway} object.}
 }
 \value{
-A `raster` object.
+A \code{raster} object.
 }
 \description{
 Download the pathway image
@@ -18,4 +21,6 @@ Download the pathway image
 \examples{
 img = get_pathway_image("h_RELAPathway")
 class(img)
+
+image_dimension("h_RELAPathway")
 }

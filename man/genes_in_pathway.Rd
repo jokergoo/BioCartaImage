@@ -7,7 +7,7 @@
 genes_in_pathway(pathway)
 }
 \arguments{
-\item{pathway}{A pathway ID or a `biocarta_pathway` object.}
+\item{pathway}{A pathway ID or a \code{biocarta_pathway} object.}
 }
 \value{
 A character vector of Entrez IDs.

@@ -10,7 +10,7 @@ get_pathway(pathway_id)
 \item{pathway_id}{A biocarta pathway ID.}
 }
 \value{
-A `biocarta_pathway` object
+A \code{biocarta_pathway} object.
 }
 \description{
 Get a single pathway
