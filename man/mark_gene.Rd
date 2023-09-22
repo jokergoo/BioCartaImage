@@ -46,7 +46,7 @@ grob = pathwayGrob("h_RELAPathway")
 grob2 = mark_gene(grob, "1387", function(x, y) {
 	pos = pos_by_polygon(x, y)
 	pointsGrob(pos[1], pos[2], default.units = "native", pch = 16, 
-		gp = gpar(col = "red"))
+		gp = gpar(col = "yellow"))
 })
 grid.draw(grob2)
 
@@ -54,17 +54,17 @@ grid.newpage()
 grob3 = mark_gene(grob, "1387", function(x, y) {
 	pos = pos_by_polygon(x, y)
 	grid.points(pos[1], pos[2], default.units = "native", pch = 16,
-		gp = gpar(col = "red"))
+		gp = gpar(col = "yellow"))
 }, capture = TRUE)
 grid.draw(grob3)
 
 grid.newpage()
 grob4 = mark_gene(grob, "1387", function(x, y) {
 	pos = pos_by_polygon(x, y)
-	pushViewport(viewport(x = pos[1], y = pos[2], 
+	pushViewport(viewport(x = pos[1] - 10, y = pos[2], 
 		width = unit(4, "cm"), height = unit(4, "cm"), 
 		default.units = "native", just = "right"))
-	grid.rect(gp = gpar(fill = "white"))
+	grid.rect(gp = gpar(fill = "red"))
 	popViewport()
 }, capture = TRUE)
 grid.draw(grob4)

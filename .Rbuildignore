@@ -1,2 +1,7 @@
 image/
 docs/
+_pkgdown.yml
+build_pkg_site.R
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
