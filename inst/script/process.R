@@ -64,6 +64,20 @@ pathway_list = lapply(pl, function(x) {
 names(pathway_list) = sapply(pathway_list, function(x) x$id)
 
 BIOCARTA_PATHWAYS = pathway_list
+
+html = read_html("https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/human/")
+msigdb_biocarta_list = html %>% html_element("table") %>% html_table()
+msigdb_biocarta_list = msigdb_biocarta_list$Name
+msigdb_biocarta_list = msigdb_biocarta_list[grep("gif$", msigdb_biocarta_list)]
+
+for(nm in names(pathway_list)) {
+	i = which(tolower(msigdb_biocarta_list) == tolower(pathway_list[[nm]]$image_file))
+	if(length(i)) {
+		pathway_list[[nm]]$msigdb_image_file = msigdb_biocarta_list[i]
+	} else {
+		pathway_list[[nm]]$msigdb_image_file = ""
+	}
+}
 save(BIOCARTA_PATHWAYS, file = "data/BIOCARTA_PATHWAYS.RData", compress = "xz")
 
 # download all gif images

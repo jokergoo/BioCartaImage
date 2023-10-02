@@ -17,3 +17,5 @@ src/*.o$
 src/*.so$
 man/temp__*
 /Meta/
+
+docs/image/*

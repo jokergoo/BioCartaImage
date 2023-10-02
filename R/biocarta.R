@@ -82,7 +82,8 @@ BC_to_entrez = function(bc_id) {
 .ENV = new.env()
 .ENV$image = list()
 
-IMAGE_BASE_URL = "https://jokergoo.github.io/BioCartaImage/image/"
+# IMAGE_BASE_URL = "https://jokergoo.github.io/BioCartaImage/image/"
+IMAGE_BASE_URL = "https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/human/"
 
 #' Download the pathway image
 #' 
