@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 ```
 
 BioCarta is a valuable source of biological pathways which not only provides
-well manually curated pathways, but also remarkably intuitive pathway images.
+well manually curated pathways, but also remarkable and intuitive pathway images.
 One useful features of pathway analysis which is to highlight genes of
-interest on the pathway images has been lost. Since the original source of
+interest on the pathway images is lost. Since the original source of
 BioCarta (biocarte.com) is lost from the internet, we digged out the data from
 the internet archive and formatted it into a package.
 
@@ -74,13 +74,13 @@ genes_in_pathway(p)
 Next, let's move to the main functionality of this package: customizing the
 pathway.
 
-First, as many other **grid** plotting functions, `grid.pathway()` draws a
+First, as many other **grid** plotting functions, `grid.biocarta()` draws a
 pathway (where the pathway image is a `raster` object internally).
 
 ```{r}
 library(grid)
 grid.newpage()
-grid.pathway("h_RELAPathway")
+grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
 ```
 
 You can specify the location and how the image is aligned to the anchor point.
@@ -88,7 +88,7 @@ You can specify the location and how the image is aligned to the anchor point.
 
 ```{r}
 grid.newpage()
-grid.pathway("h_RELAPathway", x = 0.2, y = 0.2, just = c("left", "bottom"),
+grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"),
     width = unit(6, "cm"))
 ```
 
@@ -99,7 +99,7 @@ You can also first create a viewport, then draw the pathway inside it.
 grid.newpage()
 pushViewport(viewport(width = 0.7, height = 0.5))
 grid.rect() # to show the area of the viewport
-grid.pathway("h_RELAPathway")
+grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
 ```
 
 As the aspect ratio of the image is fixed, you can either set `width` or
@@ -113,7 +113,7 @@ with dashed colored borders.
 
 ```{r}
 grid.newpage()
-grid.pathway("h_RELAPathway", color = c("1387" = "yellow"))
+grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
 ```
 
 As normally BioCarta pathway images are colorful, it is quite difficult to
@@ -124,7 +124,7 @@ the genes.
 To edit the pathway image, we create the pathway grob first ("grob" is short for "graphic object").
 
 ```{r}
-grob = pathwayGrob("h_RELAPathway")
+grob = biocartaGrob("h_RELAPathway")
 ```
 
 The object `grob` basically contains a viewport and a raster image. Later we

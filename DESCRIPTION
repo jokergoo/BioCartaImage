@@ -1,8 +1,8 @@
 Package: BioCartaImage
 Type: Package
 Title: BioCarta Pathway Images
-Version: 0.99.1
-Date: 2023-10-02
+Version: 0.99.2
+Date: 2023-10-06
 Authors@R: person("Zuguang", "Gu", email = "z.gu@dkfz.de", role = c("aut", "cre"),
                   comment = c('ORCID'="0000-0002-7395-8709"))
 Depends: R (>= 4.2.0)
@@ -10,7 +10,8 @@ Imports: magick, grid, stats, grDevices, utils
 Suggests: testthat, knitr
 biocViews: Software, Pathways, BioCarta, Visualization
 Description: The core functionality of the package is to provide coordinates of genes
-    on the pathway image and to provide methods to add self-defined graphics to the genes of interest.
+    on the BioCarta pathway images and to provide methods to add self-defined graphics 
+    to the genes of interest.
 VignetteBuilder: knitr
 URL: https://github.com/jokergoo/BioCartaImage
 License: MIT + file LICENSE

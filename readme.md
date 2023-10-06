@@ -21,7 +21,7 @@ devtools::install_github("jokergoo/BioCartaImage")
 library(BioCartaImage)
 library(grid)
 grid.newpage()
-grid.pathway("h_RELAPathway")
+grid.biocarta("h_RELAPathway")
 ```
 
 ![image](https://github.com/jokergoo/IlluminaHumanMethylationEPICv2anno.20a1.hg38/assets/449218/ffc692c2-729f-41cf-a045-bf28168a39c6)
@@ -31,7 +31,7 @@ Highlight genes:
 
 ```r
 grid.newpage()
-grid.pathway("h_RELAPathway", color = c("1387" = "yellow"))
+grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
 ```
 
 ![image](https://github.com/jokergoo/IlluminaHumanMethylationEPICv2anno.20a1.hg38/assets/449218/89f3a5d6-3b14-4e6c-a4b4-f7469dbb6528)
@@ -40,7 +40,7 @@ grid.pathway("h_RELAPathway", color = c("1387" = "yellow"))
 Add advanced graphics:
 
 ```r
-grob = pathwayGrob("h_RELAPathway")
+grob = biocartaGrob("h_RELAPathway")
 
 grid.newpage()
 grob4 = mark_gene(grob, "1387", function(x, y) {

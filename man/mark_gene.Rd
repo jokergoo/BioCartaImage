@@ -7,7 +7,7 @@
 mark_gene(grob, entrez_id, fun, min_area = 0, capture = FALSE)
 }
 \arguments{
-\item{grob}{A \code{grob} returned by \code{\link[=pathwayGrob]{pathwayGrob()}}.}
+\item{grob}{A \code{grob} returned by \code{\link[=biocartaGrob]{biocartaGrob()}}.}
 
 \item{entrez_id}{A single Entrez ID.}
 
@@ -41,7 +41,7 @@ must be set to \code{TRUE} to capture these grobs.
 \examples{
 library(grid)
 grid.newpage()
-grob = pathwayGrob("h_RELAPathway")
+grob = biocartaGrob("h_RELAPathway")
 # gene 1387 is a gene in the pathway
 grob2 = mark_gene(grob, "1387", function(x, y) {
 	pos = pos_by_polygon(x, y)

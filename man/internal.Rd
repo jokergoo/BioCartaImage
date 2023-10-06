@@ -13,7 +13,7 @@
 \method{grobHeight}{biocarta_pathway_grob}(x)
 }
 \arguments{
-\item{x}{A \code{grob} returned by \code{\link[=pathwayGrob]{pathwayGrob()}}.}
+\item{x}{A \code{grob} returned by \code{\link[=biocartaGrob]{biocartaGrob()}}.}
 }
 \value{
 A \code{grob} object.

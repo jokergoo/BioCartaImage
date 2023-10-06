@@ -141,31 +141,31 @@ image_dimension = function(pathway) {
 #' is set or inherit from parent viewport, the width and height are automatically adjust
 #' to let one dimension completely fill the viewport.
 #' 
-#' @return `pathwayGrob()` returns a `gTree` object.
+#' @return `biocartaGrob()` returns a `gTree` object.
 #' 
 #' @export
-#' @rdname pathwayGrob
+#' @rdname biocartaGrob
 #' @examples
 #' library(grid)
 #' grid.newpage()
-#' grid.pathway("h_RELAPathway")
+#' grid.biocarta("h_RELAPathway")
 #' 
-#' grob = pathwayGrob("h_RELAPathway")
-grid.pathway = function(pathway, color = NULL, 
+#' grob = biocartaGrob("h_RELAPathway")
+grid.biocarta = function(pathway, color = NULL, 
 	x = unit(0.5, "npc"), y = unit(0.5, "npc"), 
 	width = NULL, height = NULL, just = "centre", 
 	default.units = "npc", name = NULL) {
 
-	g = pathwayGrob(pathway = pathway, color = color, x = x, y = y,
+	g = biocartaGrob(pathway = pathway, color = color, x = x, y = y,
 		width = width, height = height, just = just,
 		default.units = default.units, name = name)
 	grid.draw(g)
 }
 
-#' @rdname pathwayGrob
+#' @rdname biocartaGrob
 #' @export
 #' @import grid
-pathwayGrob = function(pathway, color = NULL, 
+biocartaGrob = function(pathway, color = NULL, 
 	x = unit(0.5, "npc"), y = unit(0.5, "npc"), 
 	width = NULL, height = NULL, just = "centre", 
 	default.units = "npc", name = NULL) {
@@ -255,7 +255,7 @@ pathwayGrob = function(pathway, color = NULL,
 
 #' Internal functions for drawing the pathway grob
 #' 
-#' @param x A `grob` returned by [`pathwayGrob()`].
+#' @param x A `grob` returned by [`biocartaGrob()`].
 #' 
 #' @exportS3Method makeContext biocarta_pathway_grob
 #' @return A `grob` object.
@@ -351,7 +351,7 @@ polygon_area = function(x, y) {
 
 #' Mark a gene on the pathway image
 #' 
-#' @param grob A `grob` returned by [`pathwayGrob()`].
+#' @param grob A `grob` returned by [`biocartaGrob()`].
 #' @param entrez_id A single Entrez ID.
 #' @param fun A self-defined function to add graphics to the selected gene.
 #' @param min_area Multiple polygons may be used for one single gene in the image. It can be used
@@ -377,7 +377,7 @@ polygon_area = function(x, y) {
 #' @examples
 #' library(grid)
 #' grid.newpage()
-#' grob = pathwayGrob("h_RELAPathway")
+#' grob = biocartaGrob("h_RELAPathway")
 #' # gene 1387 is a gene in the pathway
 #' grob2 = mark_gene(grob, "1387", function(x, y) {
 #' 	pos = pos_by_polygon(x, y)

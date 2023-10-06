@@ -1,3 +1,9 @@
+## Version 0.99.2
+
+- Change names to `grid.biocarta()` and `biocartaGrob()`.
+
+-------------------
+
 ## Version 0.99.1
 
 - Use images from https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/human/
