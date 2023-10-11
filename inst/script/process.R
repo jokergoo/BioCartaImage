@@ -24,13 +24,13 @@ read_pathway = function(link) {
 	area = html %>% html_nodes(xpath = "//img[@name]/following-sibling::map/area")
 	shape = area %>% html_attr("shape")
 	coords = area %>% html_attr("coords")
-	gene_link = area %>% html_attr("href")
+	bc_link = area %>% html_attr("href")
 
 	list(
 		image_link = image_link,
 		shape = shape,
 		coords = coords,
-		gene_link = gene_link
+		bc_link = bc_link
 	)
 }
 
@@ -45,23 +45,25 @@ for(i in 1:length(links)) {
 
 # BC id, or node id
 pl = lapply(pl, function(x) {
-	l = grepl("/Genes/", x$gene_link)
+	l = grepl("/Genes/", x$bc_link)
 	x$shape = x$shape[l]
 	x$coords = x$coords[l]
 	x$coords = lapply(strsplit(x$coords, ","), as.numeric)
-	x$gene_link = x$gene_link[l]
-	x$gene_link = gsub(" ", "%20", x$gene_link)
-	x$genes = gsub("^.*BCID=(.*)$", "\\1", x$gene_link)
+	x$bc_link = x$bc_link[l]
+	x$bc_link = gsub(" ", "%20", x$bc_link)
+	x$bc = gsub("^.*BCID=(.*)$", "\\1", x$bc_link)
 	x
 })
 
 pathway_list = lapply(pl, function(x) {
-	x2 = x[c("id", "name", "genes", "shape", "coords")]
+	x2 = x[c("id", "name", "bc", "shape", "coords")]
 	x2$image_file = basename(x$image_link)
 	class(x2) = "biocarta_pathway"
 	x2
 })
 names(pathway_list) = sapply(pathway_list, function(x) x$id)
+
+
 
 BIOCARTA_PATHWAYS = pathway_list
 
@@ -85,9 +87,9 @@ for(i in seq_along(pl)) {
 	download.file(pl[[i]]$image_link, destfile = basename(pl[[i]]$image_link))
 }
 
-all_gene_links = unique(unlist(lapply(pl, function(x) x$gene_link)))
-all_gene_links = all_gene_links[grepl("/Genes/", all_gene_links)]
-all_gene_links = gsub(" ", "%20", all_gene_links)
+all_bc_links = unique(unlist(lapply(pl, function(x) x$bc_link)))
+all_bc_links = all_bc_links[grepl("/Genes/", all_bc_links)]
+all_bc_links = gsub(" ", "%20", all_bc_links)
 
 read_gene = function(link, prefix = "") {
 	cat(prefix, link, "\n")
@@ -132,31 +134,52 @@ read_gene = function(link, prefix = "") {
 
 ## genes: biocarta ID to entrez ID
 # gl = list()
-for(i in i:length(all_gene_links)) {
-	gl[[i]] = read_gene(all_gene_links[i], prefix = i)
+for(i in i:length(all_bc_links)) {
+	gl[[i]] = read_gene(all_bc_links[i], prefix = i)
 }
 
 # validate failed links
 for(i in which(sapply(gl, function(x) identical(x, "")))) {
-	gl[[i]] = read_gene(all_gene_links[i], prefix = i)
+	gl[[i]] = read_gene(all_bc_links[i], prefix = i)
 }
 
 gl = lapply(gl, function(x) unique(x[x != ""]))
-gl = tapply(seq_along(gl), gsub("^.*BCID=(.*)$", "\\1", all_gene_links), function(ind) {
+gl = tapply(seq_along(gl), gsub("^.*BCID=(.*)$", "\\1", all_bc_links), function(ind) {
 	as.character(unique(unlist(gl[ind])))
 })
 
 BC2ENTREZ = data.frame(BCID = rep(names(gl), times = sapply(gl, length)),
 	                   ENTREZ = unlist(gl))
 
-lt_foo = lapply(pathway_list, function(x) unique(x$genes))
+lt_foo = lapply(pathway_list, function(x) unique(x$bc))
 PATHWAY2BC = data.frame(PATHWAY = rep(sapply(pathway_list, function(x) x$id), times = sapply(lt_foo, length)),
 	                    BCID = unlist(lt_foo))
 
-lt_foo2 = lapply(pathway_list, function(x) unique(unlist(gl[x$genes])))
+lt_foo2 = lapply(pathway_list, function(x) unique(unlist(gl[x$bc])))
 PATHWAY2ENTREZ = data.frame(PATHWAY = rep(sapply(pathway_list, function(x) x$id), times = sapply(lt_foo2, length)),
 	                    ENTREZ = unlist(lt_foo2))
+
+
+
+## get mapping betweeo MsigDb IDs and biocarta pathway IDs
+html = read_html("https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA")
+msigdb_all_pathways = html %>% html_elements("#geneSetTable td a") %>% html_attr("href")
+msigdb2biocarta = NULL
+for(i in seq_along(msigdb_all_pathways)) {
+	cat(msigdb_all_pathways[[i]], "\n")
+	html = read_html(paste0("https://www.gsea-msigdb.org/gsea/", msigdb_all_pathways[i]))
+	tb = html %>% html_element(".lists4") %>% html_table()
+	tb[tb[, 1] == "External links", 2]
+	
+
+	msigdb_id = gsub("\\.html$", "", basename(msigdb_all_pathways[i]))
+	biocarta_id = gsub("\\.gif$", "", basename(tb[[2]][tb[[1]] == "External links"]))
+
+	msigdb2biocarta[[biocarta_id]] = msigdb_id
+}
+PATHWAY2MSIGDB = data.frame(MSIGDB = unname(unlist(msigdb2biocarta)), BIOCARTA = names(msigdb2biocarta))
 
 save(BC2ENTREZ, file = "BC2ENTREZ.RData", compress = "xz")
 save(PATHWAY2BC, file = "PATHWAY2BC.RData", compress = "xz")
 save(PATHWAY2ENTREZ, file = "PATHWAY2ENTREZ.RData", compress = "xz")
+save(PATHWAY2MSIGDB, file = "PATHWAY2MSIGDB.RData", compress = "xz")

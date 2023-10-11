@@ -30,7 +30,7 @@ biocartaGrob(
 )
 }
 \arguments{
-\item{pathway}{A pathway ID or a \code{biocarta_pathway} object.}
+\item{pathway}{A BioCarta pathway ID, a MSigDB ID or a \code{biocarta_pathway} object.}
 
 \item{color}{A named vector where names should correspond to Entrez IDs.}
 

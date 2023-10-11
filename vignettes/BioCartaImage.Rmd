@@ -2,7 +2,10 @@
 title: "Customize BioCarta Pathway Images"
 author: "Zuguang Gu (z.gu@dkfz.de)"
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{Customize BioCarta Pathway Images}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,9 +19,30 @@ knitr::opts_chunk$set(
     fig.height = 7,
     error = FALSE,
     tidy  = FALSE,
-    message = FALSE
+    message = FALSE,
+    crop = NULL
 )
 ```
+
+```{r, echo = FALSE}
+knitr::knit_hooks$set(pngquant = knitr::hook_pngquant)
+
+knitr::opts_chunk$set(
+  message = FALSE,
+  dev = "ragg_png",
+  fig.align = "center",
+  pngquant = "--speed=10 --quality=30"
+)
+```
+
+<style>
+p img {
+    border: 1px solid black;
+    padding: 0px;
+}
+</style>
+
+# Introduction
 
 BioCarta is a valuable source of biological pathways which not only provides
 well manually curated pathways, but also remarkable and intuitive pathway images.
@@ -27,16 +51,23 @@ interest on the pathway images is lost. Since the original source of
 BioCarta (biocarte.com) is lost from the internet, we digged out the data from
 the internet archive and formatted it into a package.
 
+# Preprocessing
+
 The BioCarta data is collected from
-https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways.
+[web.archive.org](https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways).
 This is an archive of BioCarta's successor website cgap.nci.nih.gov which is
-also retired from internet. The snapshot is taken on 2017-01-22. Member genes as well
-as the coordinates on the image are parsed from the HTML code. The script is
+also retired from internet. The snapshot was taken on 2017-01-22. The script is
 also shipped in the package:
 
 ```{r}
 system.file("script", "process.R", package = "BioCartaImage")
 ```
+
+The core data of this package is the coordinates of proteins in the pathway images. This information
+is included in the HTML code (in the `<map>/<area>` tags) of the web page of a certain pathway. We use the
+**rvest** package to extract such information.
+
+# Get pathways
 
 The total pathways in the BioCarta database:
 
@@ -47,19 +78,52 @@ length(ap)
 head(ap)
 ```
 
-A single pathway can be obtained by providing the pathway ID:
+A single pathway can be obtained by providing the pathway ID. It prints two numbers:
+
+- The number of nodes without removing duplicated ones. 
+- The number of unique genes that are mapped to the pathway.
+
 
 ```{r}
 p = get_pathway("h_RELAPathway")
 p
 ```
 
-The pathway object `p` is actually a very simply list which contains
-coordinates of member genes.
+[MSigDB](https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA) is also a popular resource for
+BioCarta pathway analysis. Here we also support MSigSB IDs for the BioCarta pathways. The MSigDB ID is very similar
+to the original BioCarta ID:
+
+```{r}
+# MSigDB ID
+get_pathway("BIOCARTA_RELA_PATHWAY")
+```
+
+
+The pathway object `p` is actually a very simple list which contains
+coordinates of member nodes.
 
 ```{r}
 str(p)
 ```
+
+As the users, they do not need to touch the internal part of `p`, but the elements in the list are explained as follows:
+
+- `id`: The pathway ID.
+- `name`: The pathway name.
+- `bc`: The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one
+            mapping to genes, such as protein families or complex. Here `bc` contains the primary IDs of proteins/single nodes in 
+            the pathway. The mapping to genes can be obtained by `genes_in_pathway()`.
+- `shape`: The shape of the corresponding protein/node in the pathway image.
+- `coords`: It is a list of integer vectors, which contains coordinates of the corresponding shapes, in the unit of pixels.
+           This information is retrieved from the HTML source code (in the `<area>` tag), so the the coordinates start from 
+           the top left of the image. The format of the coordinate vectors is `c(x1, y1, x2, y2, ...)`.
+- `image_file`: The file name of the pathway image.
+
+As we have already explained in the previous text, the basic units in pathways
+are proteins/nodes, while not directly genes. Thus, the so-called "bc_id" is
+used as the primary ID in the package. However, for users, they do not need
+to touch all these details. They just directly interact with genes and pathways, the mapping
+from genes to "bc_ids" and then to pathways is done automatically in the package.
 
 Similar as many other packages which contain BioCarta gene sets, the member
 genes of a pathway can be obtained by `genes_in_pathway()`. You can provide
@@ -71,13 +135,15 @@ genes_in_pathway("h_RELAPathway")
 genes_in_pathway(p)
 ```
 
+# Plot the pathway
+
 Next, let's move to the main functionality of this package: customizing the
 pathway.
 
 First, as many other **grid** plotting functions, `grid.biocarta()` draws a
-pathway (where the pathway image is a `raster` object internally).
+pathway (where the pathway image is imported as a `raster` object internally).
 
-```{r}
+```{r, crop = NULL}
 library(grid)
 grid.newpage()
 grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
@@ -86,20 +152,23 @@ grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
 You can specify the location and how the image is aligned to the anchor point.
 
 
-```{r}
+```{r, crop = NULL}
 grid.newpage()
-grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"),
+grid.biocarta("h_RELAPathway", 
+    x = unit(0.2, "npc"), y = unit(0.9, "npc"),
+    just = c("left", "top"),
+    color = c("1387" = "yellow"),
     width = unit(6, "cm"))
 ```
 
 You can also first create a viewport, then draw the pathway inside it.
 
 
-```{r}
+```{r, crop = NULL}
 grid.newpage()
 pushViewport(viewport(width = 0.7, height = 0.5))
-grid.rect() # to show the area of the viewport
 grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
+popViewport()
 ```
 
 As the aspect ratio of the image is fixed, you can either set `width` or
@@ -111,14 +180,14 @@ The simple use is to set the `color` argument which is a named vector where
 gene EntreZ ID are names. When the colors are set, the genes are highlighted
 with dashed colored borders.
 
-```{r}
+```{r, crop = NULL}
 grid.newpage()
 grid.biocarta("h_RELAPathway", color = c("1387" = "yellow"))
 ```
 
 As normally BioCarta pathway images are colorful, it is quite difficult to
 find a proper color to be distinguished from other genes. There is a more
-flexible way in the package which allows to add self-defined graphics besides
+flexible way in the package which allows to add self-defined graphics over or besides
 the genes.
 
 To edit the pathway image, we create the pathway grob first ("grob" is short for "graphic object").
@@ -127,8 +196,8 @@ To edit the pathway image, we create the pathway grob first ("grob" is short for
 grob = biocartaGrob("h_RELAPathway")
 ```
 
-The object `grob` basically contains a viewport and a raster image. Later we
-can add graphics for single genes to it.
+The object `grob` basically contains a viewport and a raster image object. Later we
+can add more graphics for single genes to it.
 
 Graphics for single genes are added by the function `mark_gene()`. You need to
 provide the pathway grob, the gene EntreZ ID and a self-defined graphics
@@ -151,7 +220,7 @@ coordinate system associated. the "xscale" and "yscale" correspond to the
 numbers of pixels horizontally and vertically. So `unit(1, "native")` means 1
 pixel in the original image.
 
-```{r}
+```{r, crop = NULL}
 grid.newpage()
 grob2 = mark_gene(grob, "1387", function(x, y) {
     pos = pos_by_polygon(x, y, where = "left")
@@ -170,7 +239,7 @@ You can directly use the grid plotting functions such as `grid.points()` or
 graphics will be captured as grobs internally.
 
 
-```{r}
+```{r, crop = NULL}
 grid.newpage()
 grob3 = mark_gene(grob, "1387", function(x, y) {
     pos = pos_by_polygon(x, y, where = "left")
@@ -181,10 +250,10 @@ grid.draw(grob3)
 ```
 
 With this functionality, you can implement complicated graphics to associate
-to a gene. In the following example, we create a viewport and put it on the
+ a gene. In the following example, we create a viewport and put it to the
 left of the gene.
 
-```{r}
+```{r, crop = NULL}
 grid.newpage()
 grob4 = mark_gene(grob, "1387", function(x, y) {
     pos = pos_by_polygon(x, y)
@@ -199,7 +268,7 @@ grid.draw(grob4)
 ```
 
 
-## Session info
+# Session info
 
 ```{r}
 sessionInfo()

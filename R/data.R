@@ -1,12 +1,15 @@
-#' Pre-computated datasets
+#' Pre-computated data objects
 #' 
-#' @details
-#' `BIOCARTA_PATHWAYS`: A list of pathways.
-#' `PATHWAY2BC`: A two-column data frame.
-#' `PATHWAY2ENTREZ`: A two-column data frame.
-#' `BC2ENTREZ`: A two-column data frame.
+#' @return
+#' - `BIOCARTA_PATHWAYS`: A list of pathway objects. The pathway object is explained in [`get_pathway()`].
+#' - `PATHWAY2BC`: A two-column data frame of pathway IDs and BC IDs.
+#' - `PATHWAY2ENTREZ`: A two-column data frame of pathway IDs and gene Entrez IDs.
+#' - `PATHWAY2MSIGDB`: A two-column data frame of pathway IDs and MSigDB IDs.
+#' - `BC2ENTREZ`: A two-column data frame of BC IDs and gene EntreZ IDs.
 #' 
-#' `BCID` is an internal ID type in BioCarta. It is more like an ID for the nodes in the pathways.
+#' The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one
+#' mapping to genes, such as protein families or complex. Here `BC_ID` is the primary ID of proteins/single nodes
+#' in BioCarta Pathways and this package provides mapping to gene EntreZ IDs.
 #' 
 #' @rdname datasets
 "BIOCARTA_PATHWAYS"
@@ -18,13 +21,15 @@
 "PATHWAY2ENTREZ"
 
 #' @rdname datasets
-"BC2ENTREZ"
+"PATHWAY2MSIGDB"
 
+#' @rdname datasets
+"BC2ENTREZ"
 
 
 .onLoad = function(libname, pkgname) {
 
-    all_vars =  c("BIOCARTA_PATHWAYS", "PATHWAY2BC", "PATHWAY2ENTREZ", "BC2ENTREZ")
+    all_vars =  c("BIOCARTA_PATHWAYS", "PATHWAY2BC", "PATHWAY2ENTREZ", "PATHWAY2MSIGDB", "BC2ENTREZ")
 
     utils::data(list = all_vars, package = pkgname, lib.loc = libname)
     ns = asNamespace(pkgname)

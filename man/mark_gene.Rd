@@ -14,14 +14,14 @@ mark_gene(grob, entrez_id, fun, min_area = 0, capture = FALSE)
 \item{fun}{A self-defined function to add graphics to the selected gene.}
 
 \item{min_area}{Multiple polygons may be used for one single gene in the image. It can be used
-to select the largest polygon. The unit for calculating the area is the pixel in the image.}
+to select the largest polygon. The unit for calculating the area is the pixel in the image (or more properly, square pixels).}
 
-\item{capture}{It is suggested \code{fun()} to directly return \code{grob} objects. But you can also directly
-use functions such as \code{grid.points()} or \code{grid.lines()}. In this case, \code{capture} must be set
-to \code{TRUE} to capture these \code{grob}s.}
+\item{capture}{It is suggested to let \code{fun()} directly return \code{grob}/\code{gTree} objects. But you can also directly
+use functions such as \code{grid.points()} or \code{grid.lines()} in \verb{fun(()}. In this case, \code{capture} must be set
+to \code{TRUE} to capture these graphics.}
 }
 \value{
-A grob where new graphics are added.
+If \code{capture = FALSE}, it must return a grob where new graphics are already added.
 }
 \description{
 Mark a gene on the pathway image
@@ -34,9 +34,9 @@ in the image, so more precisely, \code{fun()} is applied to every node that cont
 the polygon. The helper function \code{\link[=pos_by_polygon]{pos_by_polygon()}} can be used to get positions around the polygon.
 
 There are two ways to use \code{fun()}. First, \code{fun()} directly returns a \code{grob}. It can be a simple grob, such
-as by \code{\link[grid:grid.points]{grid::pointsGrob()}} or complicate grob by \code{\link[grid:grid.grob]{grid::gTree()}} and [\verb{grid::gList()]}. Second, \code{fun()}
+as by \code{\link[grid:grid.points]{grid::pointsGrob()}} or complex grob by \code{\link[grid:grid.grob]{grid::gTree()}} and \code{\link[grid:grid.grob]{grid::gList()}}. Second, \code{fun()}
 can directly include plotting functions such as \code{\link[grid:grid.points]{grid::grid.points()}}, in this case, \code{capture} argument
-must be set to \code{TRUE} to capture these grobs.
+must be set to \code{TRUE} to capture these graphics.
 }
 \examples{
 library(grid)

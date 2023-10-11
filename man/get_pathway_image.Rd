@@ -10,17 +10,22 @@ get_pathway_image(pathway)
 image_dimension(pathway)
 }
 \arguments{
-\item{pathway}{A pathway ID or a \code{biocarta_pathway} object.}
+\item{pathway}{A BioCarta pathway ID, a MSigDB ID or a \code{biocarta_pathway} object.}
 }
 \value{
-A \code{raster} object.
+\code{get_pathway_image()} returns a \code{raster} object. \code{image_dimension()} returns an integer vector of the height and width of the image.
 }
 \description{
 Download the pathway image
 }
+\details{
+The images are downloaded from \url{https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/human/}.
+}
 \examples{
 img = get_pathway_image("h_RELAPathway")
 class(img)
+# you can directly plot the raster object
+plot(img)
 
 image_dimension("h_RELAPathway")
 }

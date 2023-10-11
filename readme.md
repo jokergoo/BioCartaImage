@@ -15,6 +15,12 @@ the internet archive and formatted it into a package.
 devtools::install_github("jokergoo/BioCartaImage")
 ```
 
+Or use the **BiocManager** package:
+
+```r
+BiocManager::install("BioCartaImage")
+```
+
 ## Usage
 
 ```r

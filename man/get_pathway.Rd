@@ -7,14 +7,33 @@
 get_pathway(pathway_id)
 }
 \arguments{
-\item{pathway_id}{A biocarta pathway ID.}
+\item{pathway_id}{A BioCarta pathway ID. To make it more convenient to use, the value can also
+be a MSigDB pathway ID in the BioCarta catalogue. The format should look like: "BIOCARTA_RELA_PATHWAY".}
 }
 \value{
-A \code{biocarta_pathway} object.
+A \code{biocarta_pathway} object. The object is a simple list and contains the following elements:
+\itemize{
+\item \code{id}: The pathway ID.
+\item \code{name}: The pathway name.
+\item \code{bc}: The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one
+mapping to genes, such as protein families or complex. Here \code{bc} contains the primary IDs of proteins/single nodes in
+the pathway. The mapping to genes can be obtained by \code{\link[=genes_in_pathway]{genes_in_pathway()}}.
+\item \code{shape}: The shape of the corresponding protein/node in the pathway image.
+\item \code{coords}: It is a list of integer vectors, which contains coordinates of the corresponding shapes, in the unit of pixels.
+This information is retrieved from the HTML source code (in the \verb{<area>} tag), so the the coordinates start from
+the top left of the image. The format of the coordinate vectors is \code{c(x1, y1, x2, y2, ...)}.
+\item \code{image_file}: The file name of the pathway image.
+}
+
+The \code{bc}, \code{shape} and \code{coords} elements have the same length and in the same order.
 }
 \description{
 Get a single pathway
 }
 \examples{
 get_pathway("h_RELAPathway")
+get_pathway("BIOCARTA_RELA_PATHWAY")
+}
+\seealso{
+The BioCarta pathways on MSigDB: \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
 }

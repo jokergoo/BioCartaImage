@@ -5,14 +5,17 @@
 \alias{BIOCARTA_PATHWAYS}
 \alias{PATHWAY2BC}
 \alias{PATHWAY2ENTREZ}
+\alias{PATHWAY2MSIGDB}
 \alias{BC2ENTREZ}
-\title{Pre-computated datasets}
+\title{Pre-computated data objects}
 \format{
 An object of class \code{list} of length 314.
 
 An object of class \code{data.frame} with 4428 rows and 2 columns.
 
 An object of class \code{data.frame} with 5196 rows and 2 columns.
+
+An object of class \code{data.frame} with 292 rows and 2 columns.
 
 An object of class \code{data.frame} with 1739 rows and 2 columns.
 }
@@ -23,17 +26,24 @@ PATHWAY2BC
 
 PATHWAY2ENTREZ
 
+PATHWAY2MSIGDB
+
 BC2ENTREZ
 }
-\description{
-Pre-computated datasets
+\value{
+\itemize{
+\item \code{BIOCARTA_PATHWAYS}: A list of pathway objects. The pathway object is explained in \code{\link[=get_pathway]{get_pathway()}}.
+\item \code{PATHWAY2BC}: A two-column data frame of pathway IDs and BC IDs.
+\item \code{PATHWAY2ENTREZ}: A two-column data frame of pathway IDs and gene Entrez IDs.
+\item \code{PATHWAY2MSIGDB}: A two-column data frame of pathway IDs and MSigDB IDs.
+\item \code{BC2ENTREZ}: A two-column data frame of BC IDs and gene EntreZ IDs.
 }
-\details{
-\code{BIOCARTA_PATHWAYS}: A list of pathways.
-\code{PATHWAY2BC}: A two-column data frame.
-\code{PATHWAY2ENTREZ}: A two-column data frame.
-\code{BC2ENTREZ}: A two-column data frame.
 
-\code{BCID} is an internal ID type in BioCarta. It is more like an ID for the nodes in the pathways.
+The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one
+mapping to genes, such as protein families or complex. Here \code{BC_ID} is the primary ID of proteins/single nodes
+in BioCarta Pathways and this package provides mapping to gene EntreZ IDs.
+}
+\description{
+Pre-computated data objects
 }
 \keyword{datasets}

@@ -4,14 +4,19 @@
 \alias{pos_by_polygon}
 \title{Position around a polygon}
 \usage{
-pos_by_polygon(x, y, where = "left")
+pos_by_polygon(
+  x,
+  y,
+  where = c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft",
+    "bottomright")
+)
 }
 \arguments{
 \item{x}{x-coordinate of a polygon.}
 
 \item{y}{y-coordinate of a polygon.}
 
-\item{where}{Which side of the polygon. It should take value in \code{c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright")}.}
+\item{where}{Which side of the polygon? It should take value in \code{c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright")}.}
 }
 \value{
 A numeric scalar of length two, which is the xy-coordinate of the point.

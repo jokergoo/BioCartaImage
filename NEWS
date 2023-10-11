@@ -1,3 +1,11 @@
+## Version 0.99.4
+
+- improved documentations and vignettes
+- add more tests
+- changes according to https://github.com/Bioconductor/Contributions/issues/3162
+
+------------------
+
 ## Version 0.99.2
 
 - Change names to `grid.biocarta()` and `biocartaGrob()`.

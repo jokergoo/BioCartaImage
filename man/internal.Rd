@@ -16,11 +16,11 @@
 \item{x}{A \code{grob} returned by \code{\link[=biocartaGrob]{biocartaGrob()}}.}
 }
 \value{
-A \code{grob} object.
+\code{makeContext()} returns a \code{grob} object.
 
-A \code{unit} object.
+\code{grobWidth()} returns a \code{unit} object.
 
-A \code{unit} object.
+\code{grobHeight()} returns a \code{unit} object.
 }
 \description{
 Internal functions for drawing the pathway grob

@@ -9,13 +9,20 @@
 \arguments{
 \item{x}{A \code{biocarta_pathway} object.}
 
-\item{...}{Other arguments}
+\item{...}{Other arguments.}
 }
 \value{
 Nothing.
 }
 \description{
 Print the biocarta_pathway object
+}
+\details{
+It prints two numbers:
+\itemize{
+\item The number of nodes without removing duplicated ones.
+\item The number of unique genes that are mapped to the pathway.
+}
 }
 \examples{
 p = get_pathway("h_RELAPathway")

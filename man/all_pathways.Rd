@@ -7,10 +7,14 @@
 all_pathways()
 }
 \value{
-A vector of pathway IDs.
+A vector of pathway IDs (the primary pathway IDs on BioCarta).
 }
 \description{
 All BioCarta pathways
+}
+\details{
+The original BioCarta website (biocarta.com) is retired, but the full list of pathways can be found from archived websites such as
+\url{https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways} or \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
 }
 \examples{
 all_pathways()

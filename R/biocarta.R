@@ -1,7 +1,10 @@
 
 #' All BioCarta pathways
 #' 
-#' @return A vector of pathway IDs.
+#' @details The original BioCarta website (biocarta.com) is retired, but the full list of pathways can be found from archived websites such as
+#' \url{https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways} or \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
+#' 
+#' @return A vector of pathway IDs (the primary pathway IDs on BioCarta).
 #' @export
 #' @examples
 #' all_pathways()
@@ -11,12 +14,29 @@ all_pathways = function() {
 
 #' Get a single pathway
 #' 
-#' @param pathway_id A biocarta pathway ID.
+#' @param pathway_id A BioCarta pathway ID. To make it more convenient to use, the value can also
+#'    be a MSigDB pathway ID in the BioCarta catalogue. The format should look like: "BIOCARTA_RELA_PATHWAY".
 #' 
-#' @return A `biocarta_pathway` object.
+#' @return A `biocarta_pathway` object. The object is a simple list and contains the following elements:
+#' - `id`: The pathway ID.
+#' - `name`: The pathway name.
+#' - `bc`: The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one
+#'             mapping to genes, such as protein families or complex. Here `bc` contains the primary IDs of proteins/single nodes in 
+#'             the pathway. The mapping to genes can be obtained by [`genes_in_pathway()`].
+#' - `shape`: The shape of the corresponding protein/node in the pathway image.
+#' - `coords`: It is a list of integer vectors, which contains coordinates of the corresponding shapes, in the unit of pixels.
+#'            This information is retrieved from the HTML source code (in the `<area>` tag), so the the coordinates start from 
+#'            the top left of the image. The format of the coordinate vectors is `c(x1, y1, x2, y2, ...)`.
+#' - `image_file`: The file name of the pathway image.
+#' 
+#' The `bc`, `shape` and `coords` elements have the same length and in the same order.
+#' 
+#' @seealso
+#' The BioCarta pathways on MSigDB: \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
 #' @export
 #' @examples
 #' get_pathway("h_RELAPathway")
+#' get_pathway("BIOCARTA_RELA_PATHWAY")
 get_pathway = function(pathway_id) {
 
 	pathway_id = match_pathway_id(pathway_id)
@@ -32,7 +52,13 @@ match_pathway_id = function(pathway_id) {
 	i = which(ap2 == gsub("^\\w_", "", tolower(pathway_id)))
 
 	if(length(i) == 0) {
-		stop("Cannot find pathway:", pathway_id)
+		j = which(PATHWAY2MSIGDB$MSIGDB == pathway_id)
+
+		if(length(j) == 0) {
+			stop("Cannot find pathway:", pathway_id)
+		} else {
+			i = which(tolower(ap) == tolower(PATHWAY2MSIGDB$BIOCARTA[j]))
+		}
 	}
 
 	ap[i]
@@ -41,7 +67,12 @@ match_pathway_id = function(pathway_id) {
 #' Print the biocarta_pathway object
 #' 
 #' @param x A `biocarta_pathway` object.
-#' @param ... Other arguments
+#' @param ... Other arguments.
+#' 
+#' @details
+#' It prints two numbers:
+#' - The number of nodes without removing duplicated ones. 
+#' - The number of unique genes that are mapped to the pathway.
 #' 
 #' @exportS3Method print biocarta_pathway
 #' @return Nothing.
@@ -52,12 +83,13 @@ print.biocarta_pathway = function(x, ...) {
 	cat("A BioCarta pathway:\n")
 	cat("  ID: ", x$id, "\n", sep = "")
 	cat("  Name: ", x$name, "\n", sep = "")
-	cat("  ", length(x$genes), " nodes, ", length(unique(BC2ENTREZ$ENTREZ[BC2ENTREZ$BCID %in% x$genes])), " genes", "\n", sep = "")
+	n_genes = length(unique(BC2ENTREZ$ENTREZ[BC2ENTREZ$BCID %in% x$bc]))
+	cat("  ", length(x$bc), " nodes, ", n_genes, " genes", "\n", sep = "")
 }
 
 #' Genes in a pathway
 #' 
-#' @param pathway A pathway ID or a `biocarta_pathway` object.
+#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object.
 #' 
 #' @return A character vector of Entrez IDs.
 #' @export
@@ -67,7 +99,7 @@ genes_in_pathway = function(pathway) {
 	if(inherits(pathway, "character")) {
 		pathway = get_pathway(pathway)
 	}
-	unique(BC2ENTREZ$ENTREZ[BC2ENTREZ$BCID %in% pathway$genes])
+	unique(BC2ENTREZ$ENTREZ[BC2ENTREZ$BCID %in% pathway$bc])
 }
 
 
@@ -87,15 +119,20 @@ IMAGE_BASE_URL = "https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/hu
 
 #' Download the pathway image
 #' 
-#' @param pathway A pathway ID or a `biocarta_pathway` object.
+#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object.
 #' 
-#' @return A `raster` object.
+#' @details
+#' The images are downloaded from \url{https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/human/}.
+#' 
+#' @return `get_pathway_image()` returns a `raster` object. `image_dimension()` returns an integer vector of the height and width of the image.
 #' @export
 #' @importFrom magick image_read
 #' @importFrom grDevices as.raster
 #' @examples
 #' img = get_pathway_image("h_RELAPathway")
 #' class(img)
+#' # you can directly plot the raster object
+#' plot(img)
 #' 
 #' image_dimension("h_RELAPathway")
 get_pathway_image = function(pathway) {
@@ -123,7 +160,7 @@ image_dimension = function(pathway) {
 
 #' Draw a BioCarta pathway
 #' 
-#' @param pathway A pathway ID or a `biocarta_pathway` object.
+#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object.
 #' @param color A named vector where names should correspond to Entrez IDs.
 #' @param x A numeric vector or unit object specifying x-location.
 #' @param y A numeric vector or unit object specifying y-location.
@@ -183,6 +220,17 @@ biocartaGrob = function(pathway, color = NULL,
 	shape = pathway$shape
 	coords = pathway$coords
 
+	if(!is.null(width)) {
+		if(!is.unit(width)) {
+			width = unit(width, default.units)
+		}
+	}
+	if(!is.null(height)) {
+		if(!is.unit(height)) {
+			height = unit(height, default.units)
+		}
+	}
+
 	vp = viewport(xscale = c(0, image_width), yscale = c(0, image_height),
 		x = x, y = y, default.units = default.units, 
 		just = just, name = name)
@@ -212,11 +260,11 @@ biocartaGrob = function(pathway, color = NULL,
 
 	gl2 = list()
 
-	genes = unique(pathway$genes)
+	bc = unique(pathway$bc)
 	color2 = NULL
 	if(!is.null(color)) {
 		for(nm in names(color)) {
-			if(nm %in% genes) {
+			if(nm %in% bc) {
 				color2[[nm]] = color[[nm]]
 			}
 			# if the name is entrez
@@ -228,21 +276,21 @@ biocartaGrob = function(pathway, color = NULL,
 	}
 	if(length(color2) == 0) color2 = NA
 
-	genes = pathway$genes
+	bc = pathway$bc
 	
 	for(i in seq_len(n)) {
 		x = coords[[i]]
 		nx = length(x)
 
-		if(!is.na(color2[ genes[i] ])) {
+		if(!is.na(color2[ bc[i] ])) {
 			if(shape[i] == "poly") {
 				gl2[[i]] = polygonGrob(x[seq_len(nx/2)*2-1], image_height - x[seq_len(nx/2)*2], 
-					default.units = "native", gp = gpar(col = color2[ genes[i] ], fill = NA, lwd = 2, lty = 3))
+					default.units = "native", gp = gpar(col = color2[ bc[i] ], fill = NA, lwd = 2, lty = 3))
 			} else if(shape[i] == "rect") {
 				gl2[[i]] = rectGrob(x[1], height - x[2], width = x[3] - x[1], height = x[4] - x[2], 
-					default.units = "native", just = c("left", "bottom"), gp = gpar(col = color2[ genes[i] ], fill = NA, lwd = 2, lty = 3))
+					default.units = "native", just = c("left", "bottom"), gp = gpar(col = color2[ bc[i] ], fill = NA, lwd = 2, lty = 3))
 			} else if(shape[i] == "circle") {
-				gl2[[i]] = circleGrob(x[1], x[2], r = x[3], default.units = "native", gp = gpar(col = color2[ genes[i] ], fill = NA, lwd = 2, lty = 3))
+				gl2[[i]] = circleGrob(x[1], x[2], r = x[3], default.units = "native", gp = gpar(col = color2[ bc[i] ], fill = NA, lwd = 2, lty = 3))
 			}
 		}
 	}
@@ -258,7 +306,7 @@ biocartaGrob = function(pathway, color = NULL,
 #' @param x A `grob` returned by [`biocartaGrob()`].
 #' 
 #' @exportS3Method makeContext biocarta_pathway_grob
-#' @return A `grob` object.
+#' @return `makeContext()` returns a `grob` object.
 #' @rdname internal
 makeContext.biocarta_pathway_grob = function(x) {
 
@@ -283,7 +331,7 @@ makeContext.biocarta_pathway_grob = function(x) {
 }
 
 #' @exportS3Method grobWidth biocarta_pathway_grob
-#' @return A `unit` object.
+#' @return `grobWidth()` returns a `unit` object.
 #' @rdname internal
 grobWidth.biocarta_pathway_grob = function(x) {
 	if(x$vp$check_size) {
@@ -306,7 +354,7 @@ grobWidth.biocarta_pathway_grob = function(x) {
 }
 
 #' @exportS3Method grobHeight biocarta_pathway_grob
-#' @return A `unit` object.
+#' @return `grobHeight()` returns a `unit` object.
 #' @rdname internal
 grobHeight.biocarta_pathway_grob = function(x) {
 	if(x$vp$check_size) {
@@ -355,10 +403,10 @@ polygon_area = function(x, y) {
 #' @param entrez_id A single Entrez ID.
 #' @param fun A self-defined function to add graphics to the selected gene.
 #' @param min_area Multiple polygons may be used for one single gene in the image. It can be used
-#'         to select the largest polygon. The unit for calculating the area is the pixel in the image.
-#' @param capture It is suggested `fun()` to directly return `grob` objects. But you can also directly
-#'         use functions such as `grid.points()` or `grid.lines()`. In this case, `capture` must be set
-#'         to `TRUE` to capture these `grob`s.
+#'         to select the largest polygon. The unit for calculating the area is the pixel in the image (or more properly, square pixels).
+#' @param capture It is suggested to let `fun()` directly return `grob`/`gTree` objects. But you can also directly
+#'         use functions such as `grid.points()` or `grid.lines()` in `fun(()`. In this case, `capture` must be set
+#'         to `TRUE` to capture these graphics.
 #' 
 #' @details
 #' `fun()` should be applied to each gene. It is possible an Entrez gene is mapped to multiple nodes
@@ -368,11 +416,11 @@ polygon_area = function(x, y) {
 #' the polygon. The helper function [`pos_by_polygon()`] can be used to get positions around the polygon.
 #' 
 #' There are two ways to use `fun()`. First, `fun()` directly returns a `grob`. It can be a simple grob, such
-#' as by [`grid::pointsGrob()`] or complicate grob by [`grid::gTree()`] and [`grid::gList()]`. Second, `fun()`
+#' as by [`grid::pointsGrob()`] or complex grob by [`grid::gTree()`] and [`grid::gList()`]. Second, `fun()`
 #' can directly include plotting functions such as [`grid::grid.points()`], in this case, `capture` argument
-#' must be set to `TRUE` to capture these grobs.
+#' must be set to `TRUE` to capture these graphics.
 #' 
-#' @return A grob where new graphics are added.
+#' @return If `capture = FALSE`, it must return a grob where new graphics are already added.
 #' @export
 #' @examples
 #' library(grid)
@@ -410,7 +458,7 @@ mark_gene = function(grob, entrez_id, fun, min_area = 0, capture = FALSE) {
 	entrez_id = as.character(entrez_id)
 	bc = entrez_to_BC(entrez_id)
 
-	ind = which(pathway$genes %in% bc)
+	ind = which(pathway$bc %in% bc)
 
 	for(i in ind) {
 		xy = coords_to_xy(pathway$coords[[i]], pathway$shape[i])
@@ -445,8 +493,8 @@ coords_to_xy = function(coords, shape) {
 		list(x = coords[seq_len(n/2)*2-1],
 			 y = coords[seq_len(n/2)*2])
 	} else if(shape == "rect") {
-		list(x = c(coords[1], coords[1], coords[3], coords[3], coords[1]),
-			 y = c(coords[2], coords[2], coords[4], coords[4], coords[2]))
+		list(x = c(coords[c(1, 1, 3, 3, 1)]),
+			 y = c(coords[c(2, 2, 4, 4, 2)]))
 	} else {
 		list(x = coords[1] + coords[3]*cos(seq(0, 2*pi, 20)),
 			 y = coords[2] + coords[3]*sin(seq(0, 2*pi, 20)))
@@ -457,7 +505,7 @@ coords_to_xy = function(coords, shape) {
 #' 
 #' @param x x-coordinate of a polygon.
 #' @param y y-coordinate of a polygon.
-#' @param where Which side of the polygon. It should take value in `c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright")`.
+#' @param where Which side of the polygon? It should take value in `c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright")`.
 #' 
 #' @return A numeric scalar of length two, which is the xy-coordinate of the point.
 #' @export
@@ -468,26 +516,18 @@ coords_to_xy = function(coords, shape) {
 #'       416, 415, 422, 429, 434, 437, 436, 432, 426, 418)
 #' pos_by_polygon(x, y, "left")
 #' pos_by_polygon(x, y, "bottomleft")
-pos_by_polygon = function(x, y, where = "left") {
-	if(!where %in% c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright")) {
-		stop('`where` should take value in c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright").')
-	}
+pos_by_polygon = function(x, y, where = c("left", "right", "top", "bottom", "topleft", "topright", "bottomleft", "bottomright")) {
+	
+	where = match.arg(where)[1]
 
-	if(where == "left") {
-		c(min(x), mean(y))
-	} else if(where == "right") {
-		c(max(x), mean(y))
-	} else if(where == "top") {
-		c(mean(x), max(y))
-	} else if(where == "bottom") {
-		c(mean(x), min(y))
-	} else if(where == "topleft") {
-		c(min(x), max(y))
-	} else if(where == "topright") {
-		c(max(x), max(y))
-	} else if(where == "bottomleft") {
-		c(min(x), min(y))
-	} else if(where == "bottomright") {
-		c(min(x), max(y))
-	}
+	switch(where,
+		left = c(min(x), mean(y)),
+		right = c(max(x), mean(y)),
+		top = c(mean(x), max(y)),
+		bottom = c(mean(x), min(y)),
+		topleft = c(min(x), max(y)),
+		topright = c(max(x), max(y)),
+		bottomleft = c(min(x), min(y)),
+		bottomright = c(min(x), max(y))
+	)
 }
