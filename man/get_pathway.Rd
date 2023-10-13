@@ -7,8 +7,9 @@
 get_pathway(pathway_id)
 }
 \arguments{
-\item{pathway_id}{A BioCarta pathway ID. To make it more convenient to use, the value can also
-be a MSigDB pathway ID in the BioCarta catalogue. The format should look like: "BIOCARTA_RELA_PATHWAY".}
+\item{pathway_id}{A BioCarta pathway ID. All valid BioCarta pathway IDs are in \code{\link[=all_pathways]{all_pathways()}}.
+To make it more convenient to use, the value can also be a MSigDB pathway ID in the BioCarta catalogue.
+The format should look like: "BIOCARTA_RELA_PATHWAY".}
 }
 \value{
 A \code{biocarta_pathway} object. The object is a simple list and contains the following elements:

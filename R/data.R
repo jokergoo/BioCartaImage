@@ -1,5 +1,15 @@
-#' Pre-computated data objects
+#' Pre-computed data objects
 #' 
+#' @details
+#' `BIOCARTA_PATHWAYS`, `PATHWAY2BC`, `PATHWAY2ENTREZ` and `BC2ENTREZ` are collected from
+#' web.archive.org (\url{https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways}).
+#' `PATHWAY2MSIGDB` is collected from MSigDB database (\url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}).
+#' The script for generating these datasets can be found at:
+#'
+#' ```r
+#' system.file("script", "process.R", package = "BioCartaImage")
+#' ```
+#'
 #' @return
 #' - `BIOCARTA_PATHWAYS`: A list of pathway objects. The pathway object is explained in [`get_pathway()`].
 #' - `PATHWAY2BC`: A two-column data frame of pathway IDs and BC IDs.

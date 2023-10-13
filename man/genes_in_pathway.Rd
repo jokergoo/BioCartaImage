@@ -7,7 +7,8 @@
 genes_in_pathway(pathway)
 }
 \arguments{
-\item{pathway}{A BioCarta pathway ID, a MSigDB ID or a \code{biocarta_pathway} object.}
+\item{pathway}{A BioCarta pathway ID, a MSigDB ID or a \code{biocarta_pathway} object. All valid BioCarta pathway IDs are in \code{\link[=all_pathways]{all_pathways()}}.
+The list of MSigDB IDs for BioCarta pathways can be found at \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.}
 }
 \value{
 A character vector of Entrez IDs.

@@ -14,8 +14,9 @@ all_pathways = function() {
 
 #' Get a single pathway
 #' 
-#' @param pathway_id A BioCarta pathway ID. To make it more convenient to use, the value can also
-#'    be a MSigDB pathway ID in the BioCarta catalogue. The format should look like: "BIOCARTA_RELA_PATHWAY".
+#' @param pathway_id A BioCarta pathway ID. All valid BioCarta pathway IDs are in [`all_pathways()`]. 
+#'    To make it more convenient to use, the value can also be a MSigDB pathway ID in the BioCarta catalogue. 
+#'    The format should look like: "BIOCARTA_RELA_PATHWAY".
 #' 
 #' @return A `biocarta_pathway` object. The object is a simple list and contains the following elements:
 #' - `id`: The pathway ID.
@@ -89,7 +90,8 @@ print.biocarta_pathway = function(x, ...) {
 
 #' Genes in a pathway
 #' 
-#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object.
+#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object. All valid BioCarta pathway IDs are in [`all_pathways()`]. 
+#'        The list of MSigDB IDs for BioCarta pathways can be found at \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
 #' 
 #' @return A character vector of Entrez IDs.
 #' @export
@@ -119,7 +121,8 @@ IMAGE_BASE_URL = "https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/hu
 
 #' Download the pathway image
 #' 
-#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object.
+#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object. All valid BioCarta pathway IDs are in [`all_pathways()`]. 
+#'        The list of MSigDB IDs for BioCarta pathways can be found at \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
 #' 
 #' @details
 #' The images are downloaded from \url{https://data.broadinstitute.org/gsea-msigdb/msigdb/biocarta/human/}.

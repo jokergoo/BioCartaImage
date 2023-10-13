@@ -7,7 +7,7 @@
 \alias{PATHWAY2ENTREZ}
 \alias{PATHWAY2MSIGDB}
 \alias{BC2ENTREZ}
-\title{Pre-computated data objects}
+\title{Pre-computed data objects}
 \format{
 An object of class \code{list} of length 314.
 
@@ -44,6 +44,15 @@ mapping to genes, such as protein families or complex. Here \code{BC_ID} is the 
 in BioCarta Pathways and this package provides mapping to gene EntreZ IDs.
 }
 \description{
-Pre-computated data objects
+Pre-computed data objects
+}
+\details{
+\code{BIOCARTA_PATHWAYS}, \code{PATHWAY2BC}, \code{PATHWAY2ENTREZ} and \code{BC2ENTREZ} are collected from
+web.archive.org (\url{https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways}).
+\code{PATHWAY2MSIGDB} is collected from MSigDB database (\url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}).
+The script for generating these datasets can be found at:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{system.file("script", "process.R", package = "BioCartaImage")
+}\if{html}{\out{</div>}}
 }
 \keyword{datasets}
