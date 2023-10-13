@@ -163,7 +163,8 @@ image_dimension = function(pathway) {
 
 #' Draw a BioCarta pathway
 #' 
-#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object.
+#' @param pathway A BioCarta pathway ID, a MSigDB ID or a `biocarta_pathway` object. All valid BioCarta pathway IDs are in [`all_pathways()`]. 
+#'        The list of MSigDB IDs for BioCarta pathways can be found at \url{https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA}.
 #' @param color A named vector where names should correspond to Entrez IDs.
 #' @param x A numeric vector or unit object specifying x-location.
 #' @param y A numeric vector or unit object specifying y-location.
