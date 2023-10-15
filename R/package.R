@@ -49,4 +49,5 @@
 #' 
 #' @name BioCartaImage-package
 #' @docType package
+#' @aliases BioCartaImage
 NULL

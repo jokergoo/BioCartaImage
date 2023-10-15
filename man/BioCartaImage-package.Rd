@@ -3,6 +3,7 @@
 \docType{package}
 \name{BioCartaImage-package}
 \alias{BioCartaImage-package}
+\alias{BioCartaImage}
 \title{The BioCartaImage package}
 \description{
 BioCarta is a valuable source of biological pathways which not only provides
