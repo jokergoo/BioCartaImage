@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">BioCartaImage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.7</span>
       </span>
     </div>
 
@@ -59,19 +59,40 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pathway_id</dt>
-<dd><p>A biocarta pathway ID.</p></dd>
+<dd><p>A BioCarta pathway ID. All valid BioCarta pathway IDs are in <code><a href="all_pathways.html">all_pathways()</a></code>.
+To make it more convenient to use, the value can also be a MSigDB pathway ID in the BioCarta catalogue.
+The format should look like: "BIOCARTA_RELA_PATHWAY".</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>A <code>biocarta_pathway</code> object.</p>
+<p>A <code>biocarta_pathway</code> object. The object is a simple list and contains the following elements:</p><ul><li><p><code>id</code>: The pathway ID.</p></li>
+<li><p><code>name</code>: The pathway name.</p></li>
+<li><p><code>bc</code>: The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one
+mapping to genes, such as protein families or complex. Here <code>bc</code> contains the primary IDs of proteins/single nodes in
+the pathway. The mapping to genes can be obtained by <code><a href="genes_in_pathway.html">genes_in_pathway()</a></code>.</p></li>
+<li><p><code>shape</code>: The shape of the corresponding protein/node in the pathway image.</p></li>
+<li><p><code>coords</code>: It is a list of integer vectors, which contains coordinates of the corresponding shapes, in the unit of pixels.
+This information is retrieved from the HTML source code (in the <code>&lt;area&gt;</code> tag), so the the coordinates start from
+the top left of the image. The format of the coordinate vectors is <code>c(x1, y1, x2, y2, ...)</code>.</p></li>
+<li><p><code>image_file</code>: The file name of the pathway image.</p></li>
+</ul><p>The <code>bc</code>, <code>shape</code> and <code>coords</code> elements have the same length and in the same order.</p>
+    </div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p>The BioCarta pathways on MSigDB: <a href="https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA" class="external-link">https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA</a>.</p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_pathway</span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A BioCarta pathway:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ID: h_RELAPathway</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Name: Acetylation and Deacetylation of RelA in The Nucleus</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   35 nodes, 16 genes</span>
+<span class="r-in"><span><span class="fu">get_pathway</span><span class="op">(</span><span class="st">"BIOCARTA_RELA_PATHWAY"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A BioCarta pathway:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ID: h_RELAPathway</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Name: Acetylation and Deacetylation of RelA in The Nucleus</span>

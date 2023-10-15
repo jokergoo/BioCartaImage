@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">BioCartaImage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.7</span>
       </span>
     </div>
 
@@ -52,27 +52,30 @@
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a></h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jokergoo/BioCartaImage"</span><span class="op">)</span></span></code></pre></div>
+<p>Or use the <strong>BiocManager</strong> package:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"BioCartaImage"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jokergoo/BioCartaImage" class="external-link">BioCartaImage</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/pathwayGrob.html">grid.pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/biocartaGrob.html">grid.biocarta</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="https://github.com/jokergoo/IlluminaHumanMethylationEPICv2anno.20a1.hg38/assets/449218/ffc692c2-729f-41cf-a045-bf28168a39c6" alt=""><p class="caption">image</p>
 </div>
 <p>Highlight genes:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/pathwayGrob.html">grid.pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/biocartaGrob.html">grid.biocarta</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="https://github.com/jokergoo/IlluminaHumanMethylationEPICv2anno.20a1.hg38/assets/449218/89f3a5d6-3b14-4e6c-a4b4-f7469dbb6528" alt=""><p class="caption">image</p>
 </div>
 <p>Add advanced graphics:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">grob</span> <span class="op">=</span> <span class="fu"><a href="reference/pathwayGrob.html">pathwayGrob</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grob</span> <span class="op">=</span> <span class="fu"><a href="reference/biocartaGrob.html">biocartaGrob</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">grob4</span> <span class="op">=</span> <span class="fu"><a href="reference/mark_gene.html">mark_gene</a></span><span class="op">(</span><span class="va">grob</span>, <span class="st">"1387"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>

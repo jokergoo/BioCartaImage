@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">BioCartaImage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.7</span>
       </span>
     </div>
 
@@ -69,7 +69,7 @@
       <h1 data-toc-skip>Customize BioCarta Pathway Images</h1>
                         <h4 data-toc-skip class="author">Zuguang Gu (<a href="mailto:z.gu@dkfz.de" class="email">z.gu@dkfz.de</a>)</h4>
             
-            <h4 data-toc-skip class="date">2023-09-22</h4>
+            <h4 data-toc-skip class="date">2023-10-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jokergoo/BioCartaImage/blob/HEAD/vignettes/BioCartaImage.Rmd" class="external-link"><code>vignettes/BioCartaImage.Rmd</code></a></small>
       <div class="hidden name"><code>BioCartaImage.Rmd</code></div>
@@ -78,11 +78,29 @@
 
     
     
-<p>BioCarta is a valuable source of biological pathways which not only provides well manually curated pathways, but also remarkably intuitive pathway images. One useful features of pathway analysis which is to highlight genes of interest on the pathway images has been lost. Since the original source of BioCarta (biocarte.com) is lost from the internet, we digged out the data from the internet archive and formatted it into a package.</p>
-<p>The BioCarta data is collected from <a href="https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways" class="external-link uri">https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways</a>. This is an archive of BioCarta’s successor website cgap.nci.nih.gov which is also retired from internet. The snapshot is taken on 2017-01-22. Member genes as well as the coordinates on the image are parsed from the HTML code. The script is also shipped in the package:</p>
+<style>
+p img {
+    border: 1px solid black;
+    padding: 0px;
+}
+</style>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>BioCarta is a valuable source of biological pathways which not only provides well manually curated pathways, but also remarkable and intuitive pathway images. One useful features of pathway analysis which is to highlight genes of interest on the pathway images is lost. Since the original source of BioCarta (biocarte.com) is lost from the internet, we digged out the data from the internet archive and formatted it into a package.</p>
+</div>
+<div class="section level2">
+<h2 id="preprocessing">Preprocessing<a class="anchor" aria-label="anchor" href="#preprocessing"></a>
+</h2>
+<p>The BioCarta data is collected from <a href="https://web.archive.org/web/20170122225118/https://cgap.nci.nih.gov/Pathways/BioCarta_Pathways" class="external-link">web.archive.org</a>. This is an archive of BioCarta’s successor website cgap.nci.nih.gov which is also retired from internet. The snapshot was taken on 2017-01-22. The script is also shipped in the package:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"script"</span>, <span class="st">"process.R"</span>, package <span class="op">=</span> <span class="st">"BioCartaImage"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/private/var/folders/g3/f2y6rp510nxf3t5sj6h902bc0000gr/T/RtmpGlRYGs/temp_libpath173ae274dad83/BioCartaImage/script/process.R"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "/private/var/folders/g3/f2y6rp510nxf3t5sj6h902bc0000gr/T/RtmpWjJOjR/temp_libpath43af403ac10f/BioCartaImage/script/process.R"</span></span></code></pre>
+<p>The core data of this package is the coordinates of proteins in the pathway images. This information is included in the HTML code (in the <code>&lt;map&gt;/&lt;area&gt;</code> tags) of the web page of a certain pathway. We use the <strong>rvest</strong> package to extract such information.</p>
+</div>
+<div class="section level2">
+<h2 id="get-pathways">Get pathways<a class="anchor" aria-label="anchor" href="#get-pathways"></a>
+</h2>
 <p>The total pathways in the BioCarta database:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jokergoo/BioCartaImage" class="external-link">BioCartaImage</a></span><span class="op">)</span></span>
@@ -93,7 +111,11 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ap</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "h_RELAPathway"    "h_no1Pathway"     "h_gsPathway"      "h_CSKPathway"    </span></span>
 <span><span class="co">## [5] "h_pkcPathway"     "h_srcRPTPPathway"</span></span></code></pre>
-<p>A single pathway can be obtained by providing the pathway ID:</p>
+<p>A single pathway can be obtained by providing the pathway ID. It prints two numbers:</p>
+<ul>
+<li>The number of nodes without removing duplicated ones.</li>
+<li>The number of unique genes that are mapped to the pathway.</li>
+</ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_pathway.html">get_pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
@@ -101,13 +123,21 @@
 <span><span class="co">##   ID: h_RELAPathway</span></span>
 <span><span class="co">##   Name: Acetylation and Deacetylation of RelA in The Nucleus</span></span>
 <span><span class="co">##   35 nodes, 16 genes</span></span></code></pre>
-<p>The pathway object <code>p</code> is actually a very simply list which contains coordinates of member genes.</p>
+<p><a href="https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=CP:BIOCARTA" class="external-link">MSigDB</a> is also a popular resource for BioCarta pathway analysis. Here we also support MSigSB IDs for the BioCarta pathways. The MSigDB ID is very similar to the original BioCarta ID:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># MSigDB ID</span></span>
+<span><span class="fu"><a href="../reference/get_pathway.html">get_pathway</a></span><span class="op">(</span><span class="st">"BIOCARTA_RELA_PATHWAY"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## A BioCarta pathway:</span></span>
+<span><span class="co">##   ID: h_RELAPathway</span></span>
+<span><span class="co">##   Name: Acetylation and Deacetylation of RelA in The Nucleus</span></span>
+<span><span class="co">##   35 nodes, 16 genes</span></span></code></pre>
+<p>The pathway object <code>p</code> is actually a very simple list which contains coordinates of member nodes.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of 6</span></span>
 <span><span class="co">##  $ id        : chr "h_RELAPathway"</span></span>
 <span><span class="co">##  $ name      : chr "Acetylation and Deacetylation of RelA in The Nucleus"</span></span>
-<span><span class="co">##  $ genes     : chr [1:35] "rela" "rela" "rela" "rela" ...</span></span>
+<span><span class="co">##  $ bc        : chr [1:35] "rela" "rela" "rela" "rela" ...</span></span>
 <span><span class="co">##  $ shape     : chr [1:35] "poly" "poly" "poly" "poly" ...</span></span>
 <span><span class="co">##  $ coords    :List of 35</span></span>
 <span><span class="co">##   ..$ : num [1:42] 235 418 235 409 237 402 241 397 246 394 ...</span></span>
@@ -147,52 +177,75 @@
 <span><span class="co">##   ..$ : num [1:18] 248 378 251 381 251 391 248 394 217 394 ...</span></span>
 <span><span class="co">##  $ image_file: chr "h_relaPathway.gif"</span></span>
 <span><span class="co">##  - attr(*, "class")= chr "biocarta_pathway"</span></span></code></pre>
+<p>As the users, they do not need to touch the internal part of <code>p</code>, but the elements in the list are explained as follows:</p>
+<ul>
+<li>
+<code>id</code>: The pathway ID.</li>
+<li>
+<code>name</code>: The pathway name.</li>
+<li>
+<code>bc</code>: The nodes in the original BioCarta pathways are proteins and some of them do not have one-to-one mapping to genes, such as protein families or complex. Here <code>bc</code> contains the primary IDs of proteins/single nodes in the pathway. The mapping to genes can be obtained by <code><a href="../reference/genes_in_pathway.html">genes_in_pathway()</a></code>.</li>
+<li>
+<code>shape</code>: The shape of the corresponding protein/node in the pathway image.</li>
+<li>
+<code>coords</code>: It is a list of integer vectors, which contains coordinates of the corresponding shapes, in the unit of pixels. This information is retrieved from the HTML source code (in the <code>&lt;area&gt;</code> tag), so the the coordinates start from the top left of the image. The format of the coordinate vectors is <code>c(x1, y1, x2, y2, ...)</code>.</li>
+<li>
+<code>image_file</code>: The file name of the pathway image.</li>
+</ul>
+<p>As we have already explained in the previous text, the basic units in pathways are proteins/nodes, while not directly genes. Thus, the so-called “bc_id” is used as the primary ID in the package. However, for users, they do not need to touch all these details. They just directly interact with genes and pathways, the mapping from genes to “bc_ids” and then to pathways is done automatically in the package.</p>
 <p>Similar as many other packages which contain BioCarta gene sets, the member genes of a pathway can be obtained by <code><a href="../reference/genes_in_pathway.html">genes_in_pathway()</a></code>. You can provide the pathway ID or the pathway object. The EntreZ ID is used as the gene ID type.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/genes_in_pathway.html">genes_in_pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "1387" "8772" "8841" "4792" "1147" "3551" "8517" "4790" "2033" "5970"</span></span>
 <span><span class="co">## [11] "8737" "7124" "7132" "7133" "8717" "7189"</span></span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/genes_in_pathway.html">genes_in_pathway</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "1387" "8772" "8841" "4792" "1147" "3551" "8517" "4790" "2033" "5970"</span></span>
 <span><span class="co">## [11] "8737" "7124" "7132" "7133" "8717" "7189"</span></span></code></pre>
+</div>
+<div class="section level2">
+<h2 id="plot-the-pathway">Plot the pathway<a class="anchor" aria-label="anchor" href="#plot-the-pathway"></a>
+</h2>
 <p>Next, let’s move to the main functionality of this package: customizing the pathway.</p>
-<p>First, as many other <strong>grid</strong> plotting functions, <code><a href="../reference/pathwayGrob.html">grid.pathway()</a></code> draws a pathway (where the pathway image is a <code>raster</code> object internally).</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>First, as many other <strong>grid</strong> plotting functions, <code><a href="../reference/biocartaGrob.html">grid.biocarta()</a></code> draws a pathway (where the pathway image is imported as a <code>raster</code> object internally).</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/pathwayGrob.html">grid.pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<span><span class="fu"><a href="../reference/biocartaGrob.html">grid.biocarta</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>You can specify the location and how the image is aligned to the anchor point.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/pathwayGrob.html">grid.pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, x <span class="op">=</span> <span class="fl">0.2</span>, y <span class="op">=</span> <span class="fl">0.2</span>, just <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"bottom"</span><span class="op">)</span>,</span>
-<span>    width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">6</span>, <span class="st">"cm"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
-<p>You can also first create a viewport, then draw the pathway inside it.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/grid/viewports.html" class="external-link">pushViewport</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">viewport</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.7</span>, height <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/grid/grid.rect.html" class="external-link">grid.rect</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># to show the area of the viewport</span></span>
-<span><span class="fu"><a href="../reference/pathwayGrob.html">grid.pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
-<p>As the aspect ratio of the image is fixed, you can either set <code>width</code> or <code>height</code>. If both are set, the size of the image is internally adjusted to let the image maximally fill the plotting region.</p>
-<p>One of the main use of the pathway image is to highlight genes of interest. The simple use is to set the <code>color</code> argument which is a named vector where gene EntreZ ID are names. When the colors are set, the genes are highlighted with dashed colored borders.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/pathwayGrob.html">grid.pathway</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
-<p>As normally BioCarta pathway images are colorful, it is quite difficult to find a proper color to be distinguished from other genes. There is a more flexible way in the package which allows to add self-defined graphics besides the genes.</p>
-<p>To edit the pathway image, we create the pathway grob first (“grob” is short for “graphic object”).</p>
+<span><span class="fu"><a href="../reference/biocartaGrob.html">grid.biocarta</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, </span>
+<span>    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="st">"npc"</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="st">"npc"</span><span class="op">)</span>,</span>
+<span>    just <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"top"</span><span class="op">)</span>,</span>
+<span>    color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span>,</span>
+<span>    width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">6</span>, <span class="st">"cm"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>You can also first create a viewport, then draw the pathway inside it.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">grob</span> <span class="op">=</span> <span class="fu"><a href="../reference/pathwayGrob.html">pathwayGrob</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
-<p>The object <code>grob</code> basically contains a viewport and a raster image. Later we can add graphics for single genes to it.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grid/viewports.html" class="external-link">pushViewport</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grid/viewport.html" class="external-link">viewport</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.7</span>, height <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/biocartaGrob.html">grid.biocarta</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grid/viewports.html" class="external-link">popViewport</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>As the aspect ratio of the image is fixed, you can either set <code>width</code> or <code>height</code>. If both are set, the size of the image is internally adjusted to let the image maximally fill the plotting region.</p>
+<p>One of the main use of the pathway image is to highlight genes of interest. The simple use is to set the <code>color</code> argument which is a named vector where gene EntreZ ID are names. When the colors are set, the genes are highlighted with dashed colored borders.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/biocartaGrob.html">grid.biocarta</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1387"</span> <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>As normally BioCarta pathway images are colorful, it is quite difficult to find a proper color to be distinguished from other genes. There is a more flexible way in the package which allows to add self-defined graphics over or besides the genes.</p>
+<p>To edit the pathway image, we create the pathway grob first (“grob” is short for “graphic object”).</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grob</span> <span class="op">=</span> <span class="fu"><a href="../reference/biocartaGrob.html">biocartaGrob</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></code></pre></div>
+<p>The object <code>grob</code> basically contains a viewport and a raster image object. Later we can add more graphics for single genes to it.</p>
 <p>Graphics for single genes are added by the function <code><a href="../reference/mark_gene.html">mark_gene()</a></code>. You need to provide the pathway grob, the gene EntreZ ID and a self-defined graphics function. As you can imagine, the input of the function is the coordinate of the polygon of the gene in forms of two vectors: the x-coordinates and the y-coordinates.</p>
 <p>There are two ways to implement the graphics function. First, the function directly returns a grob object. Later this grob is inserted to the global pathway grob.</p>
 <p>There is a helper function <code><a href="../reference/pos_by_polygon.html">pos_by_polygon()</a></code> which returns the position of a certain side of the polygon.</p>
 <p>In the following code, we add a yellow point to the left side of gene “1387” (CBP in the image).</p>
 <p>The graphics are drawn in the pathway image viewport which already has a coordinate system associated. the “xscale” and “yscale” correspond to the numbers of pixels horizontally and vertically. So <code>unit(1, "native")</code> means 1 pixel in the original image.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">grob2</span> <span class="op">=</span> <span class="fu"><a href="../reference/mark_gene.html">mark_gene</a></span><span class="op">(</span><span class="va">grob</span>, <span class="st">"1387"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">pos</span> <span class="op">=</span> <span class="fu"><a href="../reference/pos_by_polygon.html">pos_by_polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, where <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span>
@@ -200,10 +253,10 @@
 <span>        pch <span class="op">=</span> <span class="fl">16</span>, gp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="va">grob2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>If you have complicated graphics, you can consider to use <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">gTree()</a></code> and <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">gList()</a></code> to combine them.</p>
 <p>If you are not familiar with <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">gTree()</a></code> and <code><a href="https://rdrr.io/r/grid/grid.grob.html" class="external-link">gList()</a></code> or <code>*Grob()</code> functions. You can directly use the grid plotting functions such as <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid.points()</a></code> or <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid.lines()</a></code>. In this case, you have to set <code>capture</code> to <code>TRUE</code>, then the graphics will be captured as grobs internally.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">grob3</span> <span class="op">=</span> <span class="fu"><a href="../reference/mark_gene.html">mark_gene</a></span><span class="op">(</span><span class="va">grob</span>, <span class="st">"1387"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">pos</span> <span class="op">=</span> <span class="fu"><a href="../reference/pos_by_polygon.html">pos_by_polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, where <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span>
@@ -211,9 +264,9 @@
 <span>        pch <span class="op">=</span> <span class="fl">16</span>, gp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span>, capture <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="va">grob3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
-<p>With this functionality, you can implement complicated graphics to associate to a gene. In the following example, we create a viewport and put it on the left of the gene.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>With this functionality, you can implement complicated graphics to associate a gene. In the following example, we create a viewport and put it to the left of the gene.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">grob4</span> <span class="op">=</span> <span class="fu"><a href="../reference/mark_gene.html">mark_gene</a></span><span class="op">(</span><span class="va">grob</span>, <span class="st">"1387"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">pos</span> <span class="op">=</span> <span class="fu"><a href="../reference/pos_by_polygon.html">pos_by_polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
@@ -225,40 +278,48 @@
 <span>    <span class="fu"><a href="https://rdrr.io/r/grid/viewports.html" class="external-link">popViewport</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span>, capture <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="va">grob4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="BioCartaImage_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;"></p>
+</div>
 <div class="section level2">
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.2.0 (2022-04-22)</span></span>
-<span><span class="co">## Platform: x86_64-apple-darwin17.0 (64-bit)</span></span>
-<span><span class="co">## Running under: macOS Big Sur/Monterey 10.16</span></span>
+<pre><code><span><span class="co">## R version 4.3.1 (2023-06-16)</span></span>
+<span><span class="co">## Platform: x86_64-apple-darwin20 (64-bit)</span></span>
+<span><span class="co">## Running under: macOS Ventura 13.2.1</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
-<span><span class="co">## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib</span></span>
-<span><span class="co">## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib</span></span>
+<span><span class="co">## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib </span></span>
+<span><span class="co">## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
 <span><span class="co">## [1] C/UTF-8/C/C/C/C</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## time zone: Europe/Berlin</span></span>
+<span><span class="co">## tzcode source: internal</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## attached base packages:</span></span>
 <span><span class="co">## [1] grid      stats     graphics  grDevices utils     datasets  methods  </span></span>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">## [1] BioCartaImage_0.99.0 knitr_1.43          </span></span>
+<span><span class="co">## [1] BioCartaImage_0.99.7 knitr_1.44           BiocStyle_2.28.1    </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] Rcpp_1.0.11       magrittr_2.0.3    R6_2.5.1          ragg_1.2.5       </span></span>
-<span><span class="co">##  [5] rlang_1.1.1       fastmap_1.1.1     highr_0.10        stringr_1.5.0    </span></span>
-<span><span class="co">##  [9] tools_4.2.0       xfun_0.39         cli_3.6.1         jquerylib_0.1.4  </span></span>
-<span><span class="co">## [13] systemfonts_1.0.4 htmltools_0.5.5   yaml_2.3.7        digest_0.6.33    </span></span>
-<span><span class="co">## [17] rprojroot_2.0.3   lifecycle_1.0.3   pkgdown_2.0.7     textshaping_0.3.6</span></span>
-<span><span class="co">## [21] purrr_1.0.1       sass_0.4.7        vctrs_0.6.3       fs_1.6.2         </span></span>
-<span><span class="co">## [25] curl_5.0.1        memoise_2.0.1     glue_1.6.2        cachem_1.0.8     </span></span>
-<span><span class="co">## [29] evaluate_0.21     rmarkdown_2.23    stringi_1.7.12    compiler_4.2.0   </span></span>
-<span><span class="co">## [33] bslib_0.5.0       magick_2.7.4      desc_1.4.2        jsonlite_1.8.7</span></span></code></pre>
+<span><span class="co">##  [1] vctrs_0.6.3         cli_3.6.1           magick_2.8.0       </span></span>
+<span><span class="co">##  [4] rlang_1.1.1         xfun_0.40           stringi_1.7.12     </span></span>
+<span><span class="co">##  [7] purrr_1.0.2         textshaping_0.3.7   jsonlite_1.8.7     </span></span>
+<span><span class="co">## [10] glue_1.6.2          rprojroot_2.0.3     htmltools_0.5.6.1  </span></span>
+<span><span class="co">## [13] ragg_1.2.6          sass_0.4.7          rmarkdown_2.25     </span></span>
+<span><span class="co">## [16] evaluate_0.22       jquerylib_0.1.4     fastmap_1.1.1      </span></span>
+<span><span class="co">## [19] lifecycle_1.0.3     yaml_2.3.7          memoise_2.0.1      </span></span>
+<span><span class="co">## [22] bookdown_0.35       BiocManager_1.30.22 stringr_1.5.0      </span></span>
+<span><span class="co">## [25] compiler_4.3.1      fs_1.6.3            Rcpp_1.0.11        </span></span>
+<span><span class="co">## [28] systemfonts_1.0.5   digest_0.6.33       R6_2.5.1           </span></span>
+<span><span class="co">## [31] curl_5.1.0          magrittr_2.0.3      bslib_0.5.1        </span></span>
+<span><span class="co">## [34] tools_4.3.1         pkgdown_2.0.7       cachem_1.0.8       </span></span>
+<span><span class="co">## [37] desc_1.4.2</span></span></code></pre>
 </div>
   </div>
 

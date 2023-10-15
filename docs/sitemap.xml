@@ -22,7 +22,13 @@
     <loc>/readme.html</loc>
   </url>
   <url>
+    <loc>/reference/BioCartaImage-package.html</loc>
+  </url>
+  <url>
     <loc>/reference/all_pathways.html</loc>
+  </url>
+  <url>
+    <loc>/reference/biocartaGrob.html</loc>
   </url>
   <url>
     <loc>/reference/datasets.html</loc>

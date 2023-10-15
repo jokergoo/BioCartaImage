@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">BioCartaImage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.7</span>
       </span>
     </div>
 
@@ -59,7 +59,7 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>grob</dt>
-<dd><p>A <code>grob</code> returned by <code><a href="pathwayGrob.html">pathwayGrob()</a></code>.</p></dd>
+<dd><p>A <code>grob</code> returned by <code><a href="biocartaGrob.html">biocartaGrob()</a></code>.</p></dd>
 
 
 <dt>entrez_id</dt>
@@ -72,20 +72,20 @@
 
 <dt>min_area</dt>
 <dd><p>Multiple polygons may be used for one single gene in the image. It can be used
-to select the largest polygon. The unit for calculating the area is the pixel in the image.</p></dd>
+to select the largest polygon. The unit for calculating the area is the pixel in the image (or more properly, square pixels).</p></dd>
 
 
 <dt>capture</dt>
-<dd><p>It is suggested <code>fun()</code> to directly return <code>grob</code> objects. But you can also directly
-use functions such as <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid.points()</a></code> or <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid.lines()</a></code>. In this case, <code>capture</code> must be set
-to <code>TRUE</code> to capture these <code>grob</code>s.</p></dd>
+<dd><p>It is suggested to let <code>fun()</code> directly return <code>grob</code>/<code>gTree</code> objects. But you can also directly
+use functions such as <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid.points()</a></code> or <code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid.lines()</a></code> in <code>fun(()</code>. In this case, <code>capture</code> must be set
+to <code>TRUE</code> to capture these graphics.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>A grob where new graphics are added.</p>
+<p>If <code>capture = FALSE</code>, it must return a grob where new graphics are already added.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -94,16 +94,16 @@ in the image, so more precisely, <code>fun()</code> is applied to every node tha
 <p><code>fun()</code> only accepts two arguments, <code>x</code> and <code>y</code> which are two vectors of xy-coordinates that define
 the polygon. The helper function <code><a href="pos_by_polygon.html">pos_by_polygon()</a></code> can be used to get positions around the polygon.</p>
 <p>There are two ways to use <code>fun()</code>. First, <code>fun()</code> directly returns a <code>grob</code>. It can be a simple grob, such
-as by <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid::pointsGrob()</a></code> or complicate grob by <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::gTree()</a></code> and [<code>grid::gList()]</code>. Second, <code>fun()</code>
+as by <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid::pointsGrob()</a></code> or complex grob by <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::gTree()</a></code> and <code><a href="https://rdrr.io/r/grid/grid-defunct.html" class="external-link">grid::gList()</a></code>. Second, <code>fun()</code>
 can directly include plotting functions such as <code><a href="https://rdrr.io/r/grid/grid.points.html" class="external-link">grid::grid.points()</a></code>, in this case, <code>capture</code> argument
-must be set to <code>TRUE</code> to capture these grobs.</p>
+must be set to <code>TRUE</code> to capture these graphics.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">grob</span> <span class="op">=</span> <span class="fu"><a href="pathwayGrob.html">pathwayGrob</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">grob</span> <span class="op">=</span> <span class="fu"><a href="biocartaGrob.html">biocartaGrob</a></span><span class="op">(</span><span class="st">"h_RELAPathway"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># gene 1387 is a gene in the pathway</span></span></span>
 <span class="r-in"><span><span class="va">grob2</span> <span class="op">=</span> <span class="fu">mark_gene</span><span class="op">(</span><span class="va">grob</span>, <span class="st">"1387"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">pos</span> <span class="op">=</span> <span class="fu"><a href="pos_by_polygon.html">pos_by_polygon</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
